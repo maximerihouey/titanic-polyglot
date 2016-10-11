@@ -42,9 +42,9 @@ test_df = pd.read_csv("data/test.csv", header=0, index_col=False)
 # Building full dataset for feature engineering purposes
 #
 considered_features = [
-    "passengerid", "pclass", "name", "sex", "age", "sibsp", "parch", "ticket", "fare", "cabin", "embarked"
+    "PassengerId", "Pclass", "Name", "Sex", "Age", "SibSp", "Parch", "Ticket", "Fare", "Cabin", "Embarked"
 ]
-train_df, train_survived = train_df[considered_features], train_df["survived"]
+train_df, train_survived = train_df[considered_features], train_df["Survived"]
 test_df = test_df[considered_features]
 
 total_df = pd.concat([train_df, test_df], axis=0)
@@ -54,17 +54,17 @@ total_df = total_df.reset_index()
 # Feature engineering
 #
 # New features
-total_df['title'] = total_df['name'].apply(extracting_title).astype("category")
-total_df['ticket_number'] = total_df["ticket"].map(extract_ticket_number)
+total_df['title'] = total_df['Name'].apply(extracting_title).astype("category")
+total_df['ticket_number'] = total_df["Ticket"].map(extract_ticket_number)
 
 # Continuus features
-continuus_features = ["pclass", "age", "fare", "sibsp", "parch"]
+continuus_features = ["Pclass", "Age", "Fare", "SibSp", "Parch"]
 for continuus_feature in continuus_features:
     if sum(total_df[continuus_feature].isnull()) > 0:
         # using the median for nans
         total_df.loc[total_df[continuus_feature].isnull(), continuus_feature] = np.nanmedian(total_df[continuus_feature])
 
-categorical_features = ["sex", "title", "embarked"]
+categorical_features = ["Sex", "title", "Embarked"]
 categorical_features_dummies = []
 for categorical_feature in categorical_features:
     if sum(total_df[categorical_feature].isnull()) > 0:
@@ -78,11 +78,11 @@ for categorical_feature in categorical_features:
 
 # Combined features
 # family size
-total_df['family_size'] = total_df['sibsp'] + total_df['parch']
+total_df['family_size'] = total_df['SibSp'] + total_df['Parch']
 
 # Discretized features
 # age discretization
-total_df['age_cat'] = pd.qcut(total_df["age"], 3).cat.codes
+total_df['age_cat'] = pd.qcut(total_df["Age"], 3).cat.codes
 
 #
 # Splitting the two datasets
@@ -105,7 +105,7 @@ prediction = classifier.predict(X_test)
 
 # Exporting the results
 submission = pd.DataFrame({
-        "PassengerId": test_df["passengerid"],
+        "PassengerId": test_df["PassengerId"],
         "Survived": prediction
     })
 submission.to_csv("submission.csv", index=False)
